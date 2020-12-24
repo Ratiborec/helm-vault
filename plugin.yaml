@@ -1,0 +1,6 @@
+name: "vault"
+version: "0.0.1"
+usage: "Get secrets from vault directly"
+description: |-
+  Purpose of plugin is to get secrets from vault directly and apply it on pre-deployment step
+command: "$HELM_PLUGIN_DIR/bin/vault"
