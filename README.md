@@ -16,3 +16,29 @@ run ```helm install/upgrade```
   
 - Search secrets in needed location
   ```export VAULT_SECRET_PATH=secret/development```
+  
+### How to use
+
+Plugin in development.
+
+You can build ```./cmd/vault/vault.go``` and leave at ```$HELM_PLUGIN_DIR/bin/```
+
+Also leave ```plugin.yaml``` in ```$HELM_PLUGIN_DIR```
+
+You need to export variables that described higher and run ```helm vault```
+
+Example of using:
+
+```
+filename=$(mktemp /tmp/value.yaml.XXXXXXX)
+helm value > $filename
+helm install release_name chart -f $filename
+```
+
+### TODO
+
+1. Installation script to automate install process
+   
+2. Make possibility to run in such way of similar
+
+```helm vault install release_name chart```

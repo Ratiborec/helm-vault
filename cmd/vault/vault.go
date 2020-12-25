@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	yaml "github.com/ghodss/yaml"
 	vault "github.com/hashicorp/vault/api"
 	"os"
+	"strings"
 )
 
 func  main()  {
@@ -22,7 +22,40 @@ func getVaultSecret() string {
 	 	panic(err)
 	 }
 	 j, _ := json.Marshal(data.Data)
-	 y, _ := yaml.JSONToYAML(j)
-	 return string(y)
+	 //fmt.Println(propToYaml(string(j)))
+	 //y, _ := yaml.JSONToYAML(j)
+	 //return string(y)
+	 return propToYaml(string(j))
+}
+func propToYaml (raw string) string {
+	var data map[string]string
+	err := json.Unmarshal([]byte(raw), &data)
+	if err != nil {
+		panic(err)
+	}
+	var myYaml string = ""
+	for k, v := range data {
+		splitedData := strings.Split(k, ".")
+		var tmpStr string = splitedData[0] + ":"
+		if len(splitedData) > 1 {
+			tmpStr = tmpStr + "\n"
+		} else {
+			tmpStr = tmpStr + " " + v + "\n"
+			myYaml = myYaml + tmpStr
+		}
+		var counter int = 1
+		for a := 1; a < len(splitedData); a++ {
+			for i := 0; i < counter; i++ {
+				tmpStr = tmpStr + "  "
+			}
+			if a == len(splitedData) - 1 {
+				tmpStr = tmpStr + splitedData[1] + ": " + v + "\n"
+				myYaml = myYaml + tmpStr
+			}
+			tmpStr = tmpStr + splitedData[1] + ":" + "\n"
+			counter++
+		}
+	}
+	return myYaml
 }
 
