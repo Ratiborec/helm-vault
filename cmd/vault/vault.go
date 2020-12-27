@@ -22,9 +22,6 @@ func getVaultSecret() string {
 	 	panic(err)
 	 }
 	 j, _ := json.Marshal(data.Data)
-	 //fmt.Println(propToYaml(string(j)))
-	 //y, _ := yaml.JSONToYAML(j)
-	 //return string(y)
 	 return propToYaml(string(j))
 }
 func propToYaml (raw string) string {

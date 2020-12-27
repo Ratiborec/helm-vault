@@ -1,5 +1,5 @@
 name: "vault"
-version: "0.0.1"
+version: "0.1.0"
 usage: "Get secrets from vault directly"
 description: |-
   Purpose of plugin is to get secrets from vault directly and apply it on pre-deployment step
