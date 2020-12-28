@@ -1,5 +1,5 @@
 name: "vault"
-version: "0.1.0"
+version: "0.1.1"
 usage: "Get secrets from vault directly"
 description: |-
   Get secrets from vault directly
