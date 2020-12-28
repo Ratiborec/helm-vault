@@ -8,28 +8,50 @@ import (
 	"strings"
 )
 
+var filename string
+
 func  main()  {
-	fmt.Print(getVaultSecret())
+	if len(os.Args) > 2 {
+		for i := 1; i < len(os.Args); i += 2 {
+			getParameter(os.Args[i], i)
+		}
+		if filename != "" {
+			writeVaultSecret()
+			fmt.Printf(filename)
+		}
+	} else {
+		fmt.Print(getVaultSecret())
+	}
+}
+
+func checkError (err error){
+	if err != nil {
+		panic(err)
+	}
+}
+
+func getParameter (action string, seq int) {
+	if seq + 1 < len(os.Args) {
+		switch action {
+			case "-f":
+				filename = os.Args[seq+1]
+		}
+	}
 }
 
 func getVaultSecret() string {
 	 client, err := vault.NewClient(&vault.Config{Address: os.Getenv("VAULT_ADDR")})
-	 if err != nil {
-		 panic(err)
-	 }
+	 checkError(err)
 	 data, err := client.Logical().Read(os.Getenv("VAULT_SECRET_PATH"))
-	 if err != nil {
-	 	panic(err)
-	 }
+	 checkError(err)
 	 j, _ := json.Marshal(data.Data)
 	 return propToYaml(string(j))
 }
+
 func propToYaml (raw string) string {
 	var data map[string]string
 	err := json.Unmarshal([]byte(raw), &data)
-	if err != nil {
-		panic(err)
-	}
+	checkError(err)
 	var myYaml string = ""
 	for k, v := range data {
 		splitedData := strings.Split(k, ".")
@@ -56,3 +78,9 @@ func propToYaml (raw string) string {
 	return myYaml
 }
 
+func writeVaultSecret () {
+	file, err := os.Create(filename)
+	checkError(err)
+	file.WriteString(getVaultSecret())
+	file.Sync()
+}
