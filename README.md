@@ -9,10 +9,10 @@ run ```helm install/upgrade```
   ```export VAULT_ADDR=https://vault.com:8200```
 
 - To set specific namespace set environment variable
-  ```export VAULT_NAMESPACE==development```
+  ```export VAULT_NAMESPACE=secret/development/creds```
 
 - In case of problems with ssl
-  ```VAULT_SKIP_VERIFY=1```
+  ```export VAULT_SKIP_VERIFY=1```
   
 - Search secrets in needed location
   ```export VAULT_SECRET_PATH=secret/development```
@@ -30,15 +30,15 @@ You need to export variables that described higher and run ```helm vault```
 Example of using:
 
 ```
-filename=$(mktemp /tmp/value.yaml.XXXXXXX)
-helm value > $filename
-helm install release_name chart -f $filename
+export VAULT_ADDR=https://vault.com:8200
+export VAULT_NAMESPACE=secret/development/creds
+export VAULT_SKIP_VERIFY=1
+export VAULT_TOKEN=s.XXXXXXXXXXXXXX
+helm install release_name chart -f $(helm vault -f /tmp/test.yaml)
 ```
 
 ### TODO
 
 1. Installation script to automate install process
-   
-2. Make possibility to run in such way of similar
 
-```helm vault install release_name chart```
+2. Add vault auth with username and password
