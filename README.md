@@ -27,6 +27,16 @@ Also leave ```plugin.yaml``` in ```$HELM_PLUGIN_DIR```
 
 You need to export variables that described higher and run ```helm vault```
 
+#### Flags
+
+```-f``` - write secrets to file and return filename
+
+```-u``` - set username. If empty ```VAULT_TOKEN``` will be used
+
+```-p``` - set password. Can be empty.
+
+```-t``` - set auth type. Can be ```userpass```  (by default) and ```ldap```
+
 Example of using:
 
 ```
@@ -37,8 +47,10 @@ export VAULT_TOKEN=s.XXXXXXXXXXXXXX
 helm install release_name chart -f $(helm vault -f /tmp/test.yaml)
 ```
 
+```
+helm vault -u username -p password -t ldap -f /tmp/test.yaml 
+```
+
 ### TODO
 
 1. Installation script to automate install process
-
-2. Add vault auth with username and password
