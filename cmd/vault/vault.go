@@ -4,24 +4,54 @@ import (
 	"encoding/json"
 	"fmt"
 	vault "github.com/hashicorp/vault/api"
+	"golang.org/x/crypto/ssh/terminal"
 	"os"
 	"strings"
+	"vault/api"
 )
 
 var filename string
+var username string
+var password string
+var authType = "userpass"
 
 func  main()  {
 	if len(os.Args) > 2 {
 		for i := 1; i < len(os.Args); i += 2 {
 			getParameter(os.Args[i], i)
 		}
+		if username != "" {
+			if password == "" {
+				fmt.Printf("Enter password: ")
+				input , err := terminal.ReadPassword(0)
+				fmt.Println()
+				checkError(err)
+				password = string(input)
+			}
+			os.Setenv("VAULT_TOKEN", authVault())
+		}
 		if filename != "" {
 			writeVaultSecret()
 			fmt.Printf(filename)
+		} else {
+			fmt.Print(getVaultSecret())
 		}
 	} else {
 		fmt.Print(getVaultSecret())
 	}
+}
+
+func authVault () string {
+	client, err := api.NewClient(&api.Config{Address: os.Getenv("VAULT_ADDR")})
+	checkError(err)
+	options := map[string]interface{}{
+		"password": password,
+	}
+	path := fmt.Sprintf("auth/%s/login/%s", authType, username)
+	secret, err := client.Logical().Write(path, options)
+	checkError(err)
+	token := secret.Auth.ClientToken
+	return token
 }
 
 func checkError (err error){
@@ -35,6 +65,12 @@ func getParameter (action string, seq int) {
 		switch action {
 			case "-f":
 				filename = os.Args[seq+1]
+			case "-u":
+				username = os.Args[seq+1]
+			case "-p":
+				password = os.Args[seq+1]
+			case "-t":
+				authType = os.Args[seq+1]
 		}
 	}
 }
@@ -52,17 +88,17 @@ func propToYaml (raw string) string {
 	var data map[string]string
 	err := json.Unmarshal([]byte(raw), &data)
 	checkError(err)
-	var myYaml string = ""
+	var myYaml = ""
 	for k, v := range data {
 		splitedData := strings.Split(k, ".")
-		var tmpStr string = splitedData[0] + ":"
+		var tmpStr = splitedData[0] + ":"
 		if len(splitedData) > 1 {
 			tmpStr = tmpStr + "\n"
 		} else {
 			tmpStr = tmpStr + " " + v + "\n"
 			myYaml = myYaml + tmpStr
 		}
-		var counter int = 1
+		var counter = 1
 		for a := 1; a < len(splitedData); a++ {
 			for i := 0; i < counter; i++ {
 				tmpStr = tmpStr + "  "
