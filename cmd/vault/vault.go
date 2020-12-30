@@ -10,10 +10,12 @@ import (
 	"vault/api"
 )
 
-var filename string
-var username string
-var password string
-var authType = "userpass"
+var (
+	filename string
+	username string
+	password string
+	authType = "userpass"
+)
 
 func  main()  {
 	if len(os.Args) > 2 {
